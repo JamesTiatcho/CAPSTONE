@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Grade 1 Quiz - Bright Tutorial</title>
+    <link rel="icon" href="{{ url_for('static', filename='tutor.png') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        .navbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: #fff;
+            padding: 10px 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .navbar .logo {
+            display: flex;
+            align-items: center;
+        }
+        .navbar .logo img {
+            margin-right: 10px;
+            width: 60px;
+            height: 60px;
+        }
+        .navbar .logo h1 {
+            color: #3d8236;
+            font-size: 24px;
+            margin: 0;
+        }
+        .navbar ul {
+            list-style-type: none;
+            display: flex;
+            margin: 0;
+            padding: 0;
+            font-weight: bold;
+        }
+        .navbar ul li {
+            margin-left: 20px;
+        }
+        .navbar ul li a {
+            color: #333;
+            text-decoration: none;
+            font-size: 18px;
+            position: relative;
+        }
+        .navbar ul li a::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            display: block;
+            margin-top: 5px;
+            right: 0;
+            background: #000000;
+            transition: width .3s ease;
+        }
+        .navbar ul li a.active::after,
+        .navbar ul li a:hover::after {
+            width: 100%;
+            left: 0;
+        }
+        .navbar .menu-btn {
+            font-size: 30px;
+            cursor: pointer;
+            color: #333;
+        }
+        .container {
+            margin: 40px auto;
+            width: 70%;
+            max-width: 600px;
+            text-align: center;
+            background-color: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        .quiz-question {
+            margin: 20px 0;
+            padding: 20px;
+            background-color: #f0f8f5;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        input[type="submit"] {
+            padding: 12px 30px;
+            background-color: #3d8236;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 20px;
+            font-size: 16px;
+        }
+        input[type="submit"]:hover {
+            background-color: #2f632a;
+        }
+        h2 {
+            font-size: 18px;
+            font-family: 'Poppins';
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <div class="logo">
+            <img src="{{ url_for('static', filename='tutor.png') }}" alt="Company Logo">
+            <h1>BRIGHT.</h1>
+        </div>
+        <ul>
+            <li><a href="{{ url_for('home') }}">HOME</a></li>
+            <li><a href="{{ url_for('assessment') }}">ASSESSMENT</a></li>
+            <li><a href="{{ url_for('match_tutor') }}">FIND A TUTOR</a></li>
+            <li><a href="#">ENROLLMENT</a></li>
+            <li><a href="#">CLASSES</a></li>
+        </ul>
+        <span class="menu-btn" onclick="openSidebar()">&#9776;</span>
+    </div>
+
+    <div class="container">
+        <h1>Grade 1 Quiz</h1>
+
+        <div class="quiz-question">
+            <h2>1. What is 2 + 2?</h2>
+            <input type="radio" id="q1a1" name="q1" value="3">
+            <label for="q1a1">3</label><br>
+            <input type="radio" id="q1a2" name="q1" value="4">
+            <label for="q1a2">4</label><br>
+            <input type="radio" id="q1a3" name="q1" value="5">
+            <label for="q1a3">5</label>
+        </div>
+
+        <div class="quiz-question">
+            <h2>2. What color is the sky on a clear day?</h2>
+            <input type="radio" id="q2a1" name="q2" value="red">
+            <label for="q2a1">Red</label><br>
+            <input type="radio" id="q2a2" name="q2" value="blue">
+            <label for="q2a2">Blue</label><br>
+            <input type="radio" id="q2a3" name="q2" value="green">
+            <label for="q2a3">Green</label>
+        </div>
+
+        <input type="submit" value="Submit">
+    </div>
+</body>
+</html>

@@ -1,0 +1,1019 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Assessment - Bright Tutorial</title>
+    <link rel="icon" href="{{ url_for('static', filename='tutor.png') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        .navbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: #e9e9d8;
+            padding: 10px 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .navbar .logo {
+            display: flex;
+            align-items: center;
+        }
+        .navbar .logo img {
+            margin-right: 10px;
+            width: 60px;
+            height: 60px;
+        }
+        .navbar .logo h1 {
+            color: #3d8236;
+            font-size: 24px;
+            margin: 0;
+        }
+        .navbar ul {
+            list-style-type: none;
+            display: flex;
+            margin: 0;
+            padding: 0;
+            font-weight: bold;
+        }
+        .navbar ul li {
+            margin-left: 20px;
+        }
+        .navbar ul li a {
+            color: #333;
+            text-decoration: none;
+            font-size: 18px;
+            position: relative;
+        }
+        .navbar ul li a::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            display: block;
+            margin-top: 5px;
+            right: 0;
+            background: #000000;
+            transition: width .3s ease;
+        }
+        .navbar ul li a.active::after,
+        .navbar ul li a:hover::after {
+            width: 100%;
+            left: 0;
+        }
+        .navbar .menu-btn {
+            font-size: 30px;
+            cursor: pointer;
+            color: #333;
+        }
+        .sidebar {
+            width: 0;
+            height: 100%;
+            position: fixed;
+            right: 0;
+            top: 0;
+            background-color: #333;
+            overflow-x: hidden;
+            padding-top: 60px;
+            transition: 0.5s;
+            color: white;
+            display: flex;
+            flex-direction: column;
+        }
+        .sidebar a {
+            color: white;
+            text-decoration: none;
+            margin: 10px 0;
+            padding-left: 20px;
+            font-size: 18px;
+            position: relative;
+        }
+        .container {
+            margin: 40px auto;
+            width: 90%;
+            max-width: 600px;
+            background-color: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s;
+        }
+        .container:hover {
+            transform: translateY(-2px);
+        }
+        .grade-selector {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        .grade-selector label {
+            font-weight: bold;
+        }
+        select {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            width: 100%;
+            margin-top: 5px;
+        }
+        .quiz-section {
+            display: none;
+            margin-top: 20px;
+        }
+        .quiz-question {
+            margin: 20px 0;
+            padding: 15px;
+            background-color: #f0f8f5;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .quiz-question p {
+            margin: 0 0 10px;
+        }
+        input[type="radio"] {
+            margin-right: 10px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #3d8236;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px 5px;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #2f632a;
+        }
+        input[type="submit"] {
+            padding: 12px 30px;
+            background-color: #3d8236;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 18px;
+            margin-top: 20px;
+            width: 100%;
+            transition: background-color 0.3s;
+        }
+        input[type="submit"]:hover {
+            background-color: #2f632a;
+        }
+        h2 {
+            font-size: 22px;
+            margin-bottom: 10px;
+            color: #3d8236;
+        }
+        .popup {
+            display: none;
+            position: fixed;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            padding: 20px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            z-index: 10;
+            border-radius: 10px;
+        }
+    
+        .popup h2 {
+            font-size: 20px;
+            color: #3d8236;
+        }
+    
+        .popup p {
+            font-size: 16px;
+        }
+    
+        .close-popup {
+            cursor: pointer;
+            background-color: #3d8236;
+            color: white;
+            padding: 8px 20px;
+            border: none;
+            border-radius: 5px;
+        }
+    
+        /* Overlay styles */
+        #overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 5;
+        }
+    
+        /* Button styles */
+        .popup-buttons {
+            margin-top: 20px;
+        }
+    
+        .popup-buttons button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 5px;
+        }
+    
+        .popup-buttons button:first-of-type {
+            background-color: #3d8236;
+            color: white;
+        }
+    
+        .popup-buttons button:first-of-type:hover {
+            background-color: #2f632a;
+        }
+    
+        .popup-buttons button:last-of-type {
+            background-color: #e0e0e0;
+            color: #333;
+        }
+    
+        .popup-buttons button:last-of-type:hover {
+            background-color: #bdbdbd;
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <div class="logo">
+            <img src="{{ url_for('static', filename='tutor.png') }}" alt="Company Logo">
+            <h1>BRIGHT.</h1>
+        </div>
+        <ul>
+            <li><a href="{{ url_for('home') }}">HOME</a></li>
+            <li><a href="{{ url_for('assessment') }}" class="active">ASSESSMENT</a></li>
+            <li><a href="{{ url_for('match_tutor') }}">FIND A TUTOR</a></li>
+            <li><a href="">ENROLLMENT</a></li>
+            <li><a href="{{ url_for('student_classes') }}">CLASSES</a></li>
+        </ul>
+        <span class="menu-btn" onclick="openSidebar()">&#9776;</span>
+    </div>
+
+    <div class="container">
+        <h1>Assessment Quiz</h1>
+
+        <div class="grade-selector">
+            <label for="grade-level">Select Grade Level:</label>
+            <select id="grade-level" onchange="showQuiz()">
+                <option value="">Select Grade Level</option>
+                <option value="1">Grade 1</option>
+                <option value="2">Grade 2</option>
+                <option value="3">Grade 3</option>
+                <option value="4">Grade 4</option>
+                <option value="5">Grade 5</option>
+                <option value="6">Grade 6</option>
+            </select>
+        </div>
+
+        <!-- Quiz Form -->
+        <form id="quiz-form" onsubmit="checkAnswers(event)">
+            <div id="quiz-container">
+                <!-- English Section -->
+                <div id="english-section" class="quiz-section" style="display: none;">
+                    <h2>English</h2>
+                    <!-- English Questions -->
+                    <div class="quiz-question grade-1">
+                        <p>1. Someone gave you a gift.</p>
+                        <label>
+                            <input type="radio" name="q1" value="A"> A. May I go outside?
+                        </label><br>
+                        <label>
+                            <input type="radio" name="q1" value="B"> B. You're welcome!
+                        </label><br>
+                        <label>
+                            <input type="radio" name="q1" value="C"> C. Thank you!
+                        </label><br>
+                    </div>
+
+                    <div class="quiz-question grade-1">
+                        <p>2. You can't reach for the juice.</p>
+                        <label>
+                            <input type="radio" name="q2" value="A"> A. May I borrow a pencil?
+                        </label><br>
+                        <label>
+                            <input type="radio" name="q2" value="B"> B. Please pass the juice.
+                        </label><br>
+                        <label>
+                            <input type="radio" name="q2" value="C"> C. Thank you!
+                        </label><br>
+                    </div>
+
+                    <div class="quiz-question grade-1">
+                        <p>3. You want to go outside.</p>
+                        <label>
+                            <input type="radio" name="q3" value="A"> A. May I go outside?
+                        </label><br>
+                        <label>
+                            <input type="radio" name="q3" value="B"> B. You're welcome!
+                        </label><br>
+                        <label>
+                            <input type="radio" name="q3" value="C"> C. May I borrow a pencil?
+                        </label><br>
+                    </div>
+
+                    <div class="quiz-question grade-1">
+                        <p>4. Someone says, "thank you."</p>
+                        <label>
+                            <input type="radio" name="q4" value="A"> A. You're welcome!
+                        </label><br>
+                        <label>
+                            <input type="radio" name="q4" value="B"> B. May I go outside?
+                        </label><br>
+                        <label>
+                            <input type="radio" name="q4" value="C"> C. Please pass the juice.
+                        </label><br>
+                    </div>
+
+                    <div class="quiz-question grade-1">
+                        <p>5. You want to borrow a pencil.</p>
+                        <label>
+                            <input type="radio" name="q5" value="A"> A. May I borrow a pencil?
+                        </label><br>
+                        <label>
+                            <input type="radio" name="q5" value="B"> B. Thank you!
+                        </label><br>
+                        <label>
+                            <input type="radio" name="q5" value="C"> C. May I go outside?
+                        </label><br>
+                    </div>
+                    <button type="button" onclick="showFilipinoSection()">Next</button>
+                </div>
+
+                <!-- Filipino Section -->
+                <div id="filipino-section" class="quiz-section" style="display: none;">
+                    <h2>Filipino</h2>
+                    <p>I. Piliin ang salitang OO kung nagsasaad ng pagsang-ayon at HINDI kung nagsasaad ng hindi pag-sangayon</p>
+                    <!-- Filipino Questions -->
+                    <div class="quiz-question grade-1">
+                        <p>1. Ang mga magulang ay may responsibilidad na alagaan ang kanilang mga anak.</p>
+                        <label><input type="radio" name="q6" value="A"> OO</label><br>
+                        <label><input type="radio" name="q6" value="B"> HINDI</label><br>
+                    </div>
+                    <div class="quiz-question grade-1">
+                        <p>2. Ang bawat tao ay may karapatang magpahayag ng kanilang opinyon.</p>
+                        <label>
+                            <input type="radio" name="q7" value="A"> OO
+                        </label><br>
+                        <label>
+                            <input type="radio" name="q7" value="B"> HINDI
+                        </label><br>
+                    </div>
+
+                    <div class="quiz-question grade-1">
+                        <p>3. Mahalaga ang edukasyon sa pag-unlad ng isang tao.</p>
+                        <label>
+                            <input type="radio" name="q8" value="A"> OO
+                        </label><br>
+                        <label>
+                            <input type="radio" name="q8" value="B"> HINDI
+                        </label><br>
+                    </div>
+
+                    <div class="quiz-question grade-1">
+                        <p>4. Ang paggalang sa iba ay hindi mahalaga.</p>
+                        <label>
+                            <input type="radio" name="q9" value="A"> OO
+                        </label><br>
+                        <label>
+                            <input type="radio" name="q9" value="B"> HINDI
+                        </label><br>
+                    </div>
+
+                    <div class="quiz-question grade-1">
+                        <p>5. Ang lahat ng tao ay pantay-pantay.</p>
+                        <label>
+                            <input type="radio" name="q10" value="A"> OO
+                        </label><br>
+                        <label>
+                            <input type="radio" name="q10" value="B"> HINDI
+                        </label><br>
+                    </div>
+
+                    <button type="button" onclick="showMathSection()">Next</button>
+                    <button type="button" onclick="showEnglishSection()">Back</button>
+                </div>
+
+                <!-- Math Section for Grade 1 -->
+                <div id="math-section" class="quiz-section" style="display: none;">
+                    <h2>Math</h2>
+                    <!-- Math Questions for Grade 1 -->
+                    <div class="quiz-question grade-1">
+                        <p>1. ILAGAY ANG TAMAN BILANG SA BAWAT LARAWAN</p>
+                        <img src="{{ url_for('static', filename='apple.png') }}" alt="Addition Problem Image" style="width: 250px; height: auto;"><br>
+                        <label>
+                            <input type="radio" name="q11" value="A"> A. Pito
+                        </label><br>
+                        <label>
+                            <input type="radio" name="q11" value="B"> B. Lima
+                        </label><br>
+                        <label>
+                            <input type="radio" name="q11" value="C"> C. Tatlo
+                        </label><br>
+                    </div>
+                
+                    <div class="quiz-question grade-1">
+                        <p>2. ILAGAY ANG TAMAN BILANG SA BAWAT LARAWAN</p>
+                        <img src="{{ url_for('static', filename='cherry.png') }}" alt="Subtraction Problem Image" style="width: 250px; height: auto;"><br>
+                        <label>
+                            <input type="radio" name="q12" value="A"> A. Tatlo
+                        </label><br>
+                        <label>
+                            <input type="radio" name="q12" value="B"> B. Walo
+                        </label><br>
+                        <label>
+                            <input type="radio" name="q12" value="C"> C. Dalawa
+                        </label><br>
+                    </div>
+                
+                    <div class="quiz-question grade-1">
+                        <p>3. What is 7 + 2?</p>
+                        <label>
+                            <input type="radio" name="q13" value="A"> A. 12
+                        </label><br>
+                        <label>
+                            <input type="radio" name="q13" value="B"> B. 10
+                        </label><br>
+                        <label>
+                            <input type="radio" name="q13" value="C"> C. 9
+                        </label><br>
+                    </div>
+
+                    <div class="quiz-question grade-1">
+                        <p>4. What is 5 - 2?</p>
+                        <label>
+                            <input type="radio" name="q14" value="A"> A. 3
+                        </label><br>
+                        <label>
+                            <input type="radio" name="q14" value="B"> B. 4
+                        </label><br>
+                        <label>
+                            <input type="radio" name="q14" value="C"> C. 6
+                        </label><br>
+                    </div>
+
+                    <div class="quiz-question grade-1">
+                        <p>5. What is 10 + 2?</p>
+                        <label>
+                            <input type="radio" name="q15" value="A"> A. 12
+                        </label><br>
+                        <label>
+                            <input type="radio" name="q15" value="B"> B. 15
+                        </label><br>
+                        <label>
+                            <input type="radio" name="q15" value="C"> C. 9
+                        </label><br>
+                    </div>
+
+                    <button type="button" onclick="showScienceSection()">Next</button>
+                    <button type="button" onclick="showFilipinoSection()">Back</button>
+                </div>
+
+                <!-- Science Fill in the Blanks Section for Grade 1 -->
+                <div id="science-section" class="quiz-section" style="display: none;">
+                    <h2>Science</h2>
+                    <p>Fill in the blanks:</p>
+                    
+                    <!-- Word choices in a box -->
+                    <div style="border: 1px solid #000; padding: 10px; text-align: center; margin: 0 auto 20px auto; width: 50%;">
+                        <strong>tongue</strong> &nbsp; <strong>eyes</strong> &nbsp; <strong>ear</strong> &nbsp; <strong>mouth</strong> &nbsp; <strong>hands</strong> 
+                    </div>                    
+
+                    <!-- Science Fill in the Blank Questions -->
+                    <div class="quiz-question grade-1">
+                        <label>
+                        <p>1. Deomark use his <input type="text" name="q16" placeholder="Type your answer here"> to see</p>
+                        </label><br>
+                        <label>
+                        <p>2. We use our <input type="text" name="q17" placeholder="Type your answer here"> to hold and pick up things</p>
+                        </label><br>
+                        <label>
+                        <p>3. The part of our body that helps us hear is the <input type="text" name="q18" placeholder="Type your answer here"> .</p>
+                        </label><br>
+                        <label>
+                        <p>4. Appa uses his <input type="text" name="q19" placeholder="Type your answer here"> to taste food that his mother cooked</p>
+                        </label><br>
+                        <label>
+                        <p>5. Yan kiss her mother using <input type="text" name="q20" placeholder="Type your answer here">.</p>
+                        </label>
+                    </div>
+
+                    <button type="button" onclick="showMathSection()">Back</button>
+                    <input type="submit" value="Submit">
+
+                </div>
+
+
+                <!-- English Section for Grade 2 -->
+                <div id="english-section-grade-2" class="quiz-section" style="display: none;">
+                    <h2>English</h2>
+                    <p>Instruction: Tell whether the group of words is a sentence or not. Write YES if it is a sentence and NO if it is not.</p>
+                    <div class="quiz-question grade-2">
+                        <label>
+                            <p><input type="text" name="q21" placeholder="" style="width: 80px;"> 1. he helps the old man</p>
+                        </label><br>
+                        <label>
+                            <p><input type="text" name="q22" placeholder="" style="width: 80px;"> 2. old man gives</p>
+                        </label><br>
+                        <label>
+                            <p><input type="text" name="q23" placeholder="" style="width: 80px;"> 3. aside from the pancit, the old man helps the boy earn more money</p>
+                        </label><br>
+                        <label>
+                            <p><input type="text" name="q24" placeholder="" style="width: 80px;"> 4. kind people get a greater reward</p>
+                        </label><br>
+                        <label>
+                            <p><input type="text" name="q25" placeholder="" style="width: 80px;"> 5. his friends</p>
+                        </label><br>
+                    </div>
+                    <button type="button" class="bnbutton" onclick="showFilipinoSectionGrade2()">Next</button>
+                </div>
+                
+                <div id="filipino-section-grade-2" class="quiz-section" style="display: none;">
+                    <h2>Filipino</h2>
+                    <!-- Filipino Questions -->
+                    <div class="quiz-question grade-2">
+                        <p>1. Alin ang tamang pagpapantig ng salitang pagtitipon</p>
+                        <label><input type="radio" name="q26" value="A"> A. pagti-ti-pon </label><br>
+                        <label><input type="radio" name="q26" value="B"> B. pag-ti-ti-pon </label><br>
+                        <label><input type="radio" name="q26" value="C"> C. pagtiti-pon </label><br>
+                        <label><input type="radio" name="q26" value="D"> D. pag-ti-tipon</label><br>
+                    </div>
+                    <div class="quiz-question grade-2">
+                        <p>2. Alin ang tamang pagpapantig ng salitang laruan?</p>
+                        <label><input type="radio" name="q27" value="A"> A. la-ru-an  </label><br>
+                        <label><input type="radio" name="q27" value="B"> B. la-ruan </label><br>
+                        <label><input type="radio" name="q27" value="C"> C. lar-u-an  </label><br>
+                        <label><input type="radio" name="q27" value="D"> D. laru-an</label><br>
+                    </div>
+                    
+                    <div class="quiz-question grade-2">
+                        <p>3. Ilang pantig mayroon ang salitang alimango?</p>
+                        <label><input type="radio" name="q28" value="A"> A. 1   </label><br>
+                        <label><input type="radio" name="q28" value="B"> B. 2  </label><br>
+                        <label><input type="radio" name="q28" value="C"> C. 3   </label><br>
+                        <label><input type="radio" name="q28" value="D"> D. 4</label><br>
+                    </div>
+                
+                    <div class="quiz-question grade-2">
+                        <p>4. Ilang pantig mayroon ang salitang manika?</p>
+                        <label><input type="radio" name="q29" value="A"> A. 1   </label><br>
+                        <label><input type="radio" name="q29" value="B"> B. 2  </label><br>
+                        <label><input type="radio" name="q29" value="C"> C. 3   </label><br>
+                        <label><input type="radio" name="q29" value="D"> D. 4</label><br>
+                    </div>
+                
+                    <div class="quiz-question grade-2">
+                        <p>5. Alin sa mga karaniwang pangngalan ang ngalan ng tao?</p>
+                        <label><input type="radio" name="q30" value="A"> A.tubig   </label><br>
+                        <label><input type="radio" name="q30" value="B"> B. daga  </label><br>
+                        <label><input type="radio" name="q30" value="C"> C. pulis   </label><br>
+                        <label><input type="radio" name="q30" value="D"> D. Flores</label><br>
+                    </div>
+                
+                    <button type="button" class="bnbutton" onclick="showMathSectionGrade2()">Next</button>
+                    <button type="button" class="bnbutton" onclick="showEnglishSectionGrade2()">Back</button>
+                </div>
+
+                <div id="math-section-grade-2" class="quiz-section" style="display: none;">
+                <h2>Math</h2>
+                <p>Panuto: Piliin ang tamang sagot.</p>
+                <div class="quiz-question grade-2">
+                    <p>1. Ako ay numero bago mag 1000. Sino ako?</p>
+                    <label><input type="radio" name="q31" value="A"> A. 1200</label><br>
+                    <label><input type="radio" name="q31" value="B"> B. 1100</label><br>
+                    <label><input type="radio" name="q31" value="C"> C. 900</label><br>
+                </div>
+                <div class="quiz-question grade-2">
+                    <p>2. Anong numero ang bago mag 200.</p>
+                    <label><input type="radio" name="q32" value="A"> A. 100</label><br>
+                    <label><input type="radio" name="q32" value="B"> B. 300</label><br>
+                    <label><input type="radio" name="q32" value="C"> C. 500</label><br>
+                </div>
+                <div class="quiz-question grade-2">
+                    <p>3. Anong numero ang bago mag 600?</p>
+                    <label><input type="radio" name="q33" value="A"> A. 400</label><br>
+                    <label><input type="radio" name="q33" value="B"> B. 500</label><br>
+                    <label><input type="radio" name="q33" value="C"> c. 700</label><br>
+                </div>
+                <div class="quiz-question grade-2">
+                    <p>4. Anong numero ang nasa pagitan ng 600 at 800?</p>
+                    <label><input type="radio" name="q34" value="A"> A. 500</label><br>
+                    <label><input type="radio" name="q34" value="B"> B. 700</label><br>
+                    <label><input type="radio" name="q34" value="C"> c. 900</label><br>
+                </div>
+                <div class="quiz-question grade-2">
+                    <p>5. Anong numero ang pagkatapos ng 800?</p>
+                    <label><input type="radio" name="q35" value="A"> A. 900</label><br>
+                    <label><input type="radio" name="q35" value="B"> B. 700</label><br>
+                    <label><input type="radio" name="q35" value="C"> c. 1000</label><br>
+                </div>
+
+                    <button type="button" class="bnbutton" onclick="showScienceSectionGrade2()">Next</button>
+                    <button type="button" class="bnbutton" onclick="showFilipinoSectionGrade2()">Back</button>
+                </div>
+
+                <div id="science-section-grade-2" class="quiz-section" style="display: none;">
+                    <h2>Science</h2>
+                    <p>Instructions: Choose the correct answer.</p>
+                    
+                    <div class="quiz-question grade-2">
+                        <p>1. What do you call animals that have fur?</p>
+                        <label><input type="radio" name="q36" value="A"> A. Bird</label><br>
+                        <label><input type="radio" name="q36" value="B"> B. Fish</label><br>
+                        <label><input type="radio" name="q36" value="C"> C. Cat</label><br>
+                    </div>
+                    
+                    <div class="quiz-question grade-2">
+                        <p>2. Which part of the body is used for breathing?</p>
+                        <label><input type="radio" name="q37" value="A"> A. Mouth</label><br>
+                        <label><input type="radio" name="q37" value="B"> B. Nose</label><br>
+                        <label><input type="radio" name="q37" value="C"> C. Hand</label><br>
+                    </div>
+                    
+                    <div class="quiz-question grade-2">
+                        <p>3. What is the largest planet in our solar system?</p>
+                        <label><input type="radio" name="q38" value="A"> A. Mars</label><br>
+                        <label><input type="radio" name="q38" value="B"> B. Jupiter</label><br>
+                        <label><input type="radio" name="q38" value="C"> C. Saturn</label><br>
+                    </div>
+                    
+                    <div class="quiz-question grade-2">
+                        <p>4. Which of the following lives in water?</p>
+                        <label><input type="radio" name="q39" value="A"> A. Bird</label><br>
+                        <label><input type="radio" name="q39" value="B"> B. Fish</label><br>
+                        <label><input type="radio" name="q39" value="C"> C. Cat</label><br>
+                    </div>
+                    
+                    <div class="quiz-question grade-2">
+                        <p>5. What part of the plant helps absorb water from the ground?</p>
+                        <label><input type="radio" name="q40" value="A"> A. Leaf</label><br>
+                        <label><input type="radio" name="q40" value="B"> B. Root</label><br>
+                        <label><input type="radio" name="q40" value="C"> C. Stem</label><br>
+                    </div>
+                    
+                    <button type="button" class="bnbutton" onclick="showMathSectionGrade2()">Back</button>
+                    <input type="submit" value="Submit">
+                </div>
+                
+
+            </div>
+        </div>
+    </form>
+</div>
+
+        <div id="overlay" class="overlay"></div>
+<div id="popup" class="popup">
+    <h2>Your Score</h2>
+    <p id="english-score"></p>
+    <p id="filipino-score"></p>
+    <p id="math-score"></p>
+    <p id="science-score"></p>
+    <p style="font-weight: bolder; font-size: 20px;" id="total-score"></p>
+    <div class="popup-buttons">
+        <button onclick="findTutor()">Find a Tutor</button>
+        <button onclick="retakeAssessment()">Retake Assessment</button>
+    </div>
+</div>
+<div id="overlay"></div>
+
+
+    <div id="sidebar" class="sidebar">
+        <a href="{{ url_for('home') }}">HOME</a>
+        <a href="#">ASSESSMENT</a>
+        <a href="{{ url_for('match_tutor') }}">FIND A TUTOR</a>
+        <a href="#">ENROLLMENT</a>
+        <a href="#">CLASSES</a>
+    </div>
+
+    <script>
+        let englishAnswers = {};
+        let filipinoAnswers = {};
+        let mathAnswers = {};
+        let scienceAnswers = {};
+        let englishAnswersGrade2 = {};
+        let filipinoAnswersGrade2 = {};
+        let mathAnswersGrade2 = {};
+        let scienceAnswersGrade2 = {};
+
+        function openSidebar() {
+            document.getElementById("sidebar").style.width = "250px";
+        }
+
+        function closeSidebar() {
+            document.getElementById("sidebar").style.width = "0";
+        }
+        function findTutor() {
+    // Redirect to the "Find a Tutor" page
+    window.location.href = '{{ url_for("match_tutor") }}';
+}
+
+function retakeAssessment() {
+    // Hide the popup and reset the form
+    document.getElementById('popup').style.display = 'none';
+    document.getElementById('overlay').style.display = 'none';
+    
+    // Optionally, reset the quiz form or show the first section again
+    if (gradeLevel === '1') {
+    document.getElementById('quiz-form').reset();
+    document.getElementById('english-section').style.display = 'block';
+    document.getElementById('filipino-section').style.display = 'none';
+    document.getElementById('math-section').style.display = 'none';
+    document.getElementById('science-section').style.display = 'none';
+    } else if (gradeLevel === '2') {
+        document.getElementById('quiz-form').reset();
+        document.getElementById('english-section-grade-2').style.display = 'block';
+        document.getElementById('filipino-section-grade-2').style.display = 'block';
+        document.getElementById('math-section-grade-2').style.display = 'block';
+        document.getElementById('science-section-grade-2').style.display = 'none';
+
+     }
+}
+
+function showQuiz() {
+    const grade = document.getElementById('grade-level').value;
+
+    // Hide all sections first
+    document.getElementById('english-section').style.display = 'none';
+    document.getElementById('filipino-section').style.display = 'none';
+    document.getElementById('math-section').style.display = 'none';
+    document.getElementById('science-section').style.display = 'none';
+    document.getElementById('english-section-grade-2').style.display = 'none';
+    document.getElementById('filipino-section-grade-2').style.display = 'none';
+    document.getElementById('math-section-grade-2').style.display = 'none';
+    document.getElementById('science-section-grade-2').style.display = 'none';
+
+    // Show sections based on selected grade
+    if (grade == 1) {
+        document.getElementById('english-section').style.display = 'block';
+        document.getElementById('filipino-section').style.display = 'none';
+        document.getElementById('math-section').style.display = 'none';
+        document.getElementById('science-section').style.display = 'none';
+    } else if (grade == 2) {
+        document.getElementById('english-section-grade-2').style.display = 'block';
+        document.getElementById('filipino-section-grade-2').style.display = 'none';
+        document.getElementById('math-section-grade-2').style.display = 'none';
+        document.getElementById('science-section-grade-2').style.display = 'none';
+
+    } 
+}
+        function showEnglishSection() {
+            saveEnglishAnswers();
+            document.getElementById('english-section').style.display = 'block';
+            document.getElementById('filipino-section').style.display = 'none';
+            document.getElementById('math-section').style.display = 'none';
+            document.getElementById('science-section').style.display = 'none';
+        
+        document.querySelectorAll('#english-section input[type="radio"]').forEach(input => {
+                if (englishAnswers[input.name] === input.value) {
+                    input.checked = true;
+                }
+            });
+        }
+
+        function showFilipinoSection() {
+            saveEnglishAnswers();
+            document.getElementById('english-section').style.display = 'none';
+            document.getElementById('filipino-section').style.display = 'block';
+            document.getElementById('math-section').style.display = 'none';
+            document.getElementById('science-section').style.display = 'none';
+
+
+            // Restore Filipino answers
+            document.querySelectorAll('#filipino-section input[type="radio"]').forEach(input => {
+                if (filipinoAnswers[input.name] === input.value) {
+                    input.checked = true;
+                }
+            });
+        }
+
+        function showMathSection() {
+            saveFilipinoAnswers();
+            document.getElementById('english-section').style.display = 'none';
+            document.getElementById('filipino-section').style.display = 'none';
+            document.getElementById('math-section').style.display = 'block';
+            document.getElementById('science-section').style.display = 'none';
+
+            // Restore Math answers for Grade 1
+            document.querySelectorAll('#math-section input[type="radio"]').forEach(input => {
+                if (mathAnswers[input.name] === input.value) {
+                    input.checked = true;
+                }
+            });
+        }
+
+        function showScienceSection() {
+            saveMathAnswers();
+            document.getElementById('english-section').style.display = 'none';
+            document.getElementById('filipino-section').style.display = 'none';
+            document.getElementById('math-section').style.display = 'none';
+            document.getElementById('science-section').style.display = 'block';
+            // Restore Math answers for Grade 1
+            document.querySelectorAll('#science-section input[type="text"]').forEach(input => {
+                if (scienceAnswers[input.name] === input.value) {
+                    input.checked = true;
+                }
+            });
+        }
+
+        function showEnglishSectionGrade2() {
+            saveEnglishAnswersGrade2();
+            document.getElementById('english-section-grade-2').style.display = 'block';
+            document.getElementById('filipino-section-grade-2').style.display = 'none';
+            document.getElementById('math-section-grade-2').style.display = 'none';
+            document.getElementById('science-section-grade-2').style.display = 'none';
+
+            // Restore Math answers for Grade 2
+            document.querySelectorAll('#english-section-grade-2 input[type="text"]').forEach(input => {
+                if (englishAnswersGrade2[input.name] === input.value) {
+                    input.checked = true;
+                }
+            });
+        }
+
+        function showFilipinoSectionGrade2() {
+            saveEnglishAnswersGrade2();
+            document.getElementById('english-section-grade-2').style.display = 'none';
+            document.getElementById('filipino-section-grade-2').style.display = 'block';
+            document.getElementById('math-section-grade-2').style.display = 'none';
+            document.getElementById('science-section-grade-2').style.display = 'none';
+
+            // Restore Math answers for Grade 2
+            document.querySelectorAll('#filipino-section-grade-2 input[type="radio"]').forEach(input => {
+                if (filipinoAnswersGrade2[input.name] === input.value) {
+                    input.checked = true;
+                }
+            });
+        }
+
+        function showMathSectionGrade2() {
+            saveFilipinoAnswersGrade2();
+            document.getElementById('english-section-grade-2').style.display = 'none';
+            document.getElementById('filipino-section-grade-2').style.display = 'none';
+            document.getElementById('math-section-grade-2').style.display = 'block';
+            document.getElementById('science-section-grade-2').style.display = 'none';
+
+            // Restore Math answers for Grade 2
+            document.querySelectorAll('#math-section-grade-2 input[type="radio"]').forEach(input => {
+                if (mathAnswersGrade2[input.name] === input.value) {
+                    input.checked = true;
+                }
+            });
+        }
+
+        function showScienceSectionGrade2() {
+            saveMathAnswersGrade2();
+            document.getElementById('english-section-grade-2').style.display = 'none';
+            document.getElementById('filipino-section-grade-2').style.display = 'none';
+            document.getElementById('math-section-grade-2').style.display = 'none';
+            document.getElementById('science-section-grade-2').style.display = 'block';
+
+            // Restore Math answers for Grade 2
+            document.querySelectorAll('#science-section-grade-2 input[type="radio"]').forEach(input => {
+                if (scienceAnswersGrade2[input.name] === input.value) {
+                    input.checked = true;
+                }
+            });
+        }
+
+        function saveEnglishAnswers() {
+            document.querySelectorAll('#english-section input[type="radio"]:checked').forEach(q => {
+                englishAnswers[q.name] = q.value;
+            });
+        }
+
+        function saveFilipinoAnswers() {
+            document.querySelectorAll('#filipino-section input[type="radio"]:checked').forEach(q => {
+                filipinoAnswers[q.name] = q.value;
+            });
+        }
+
+        function saveMathAnswers() {
+            document.querySelectorAll('#math-section input[type="radio"]:checked').forEach(q => {
+                mathAnswers[q.name] = q.value;
+            });
+        }
+
+        function saveScienceAnswers() {
+            document.querySelectorAll('#science-section input[type="text"]').forEach(q => {
+                scienceAnswers[q.name] = q.value.trim(); // Save the entered value
+            });
+        }
+
+        function saveEnglishAnswersGrade2() {
+            document.querySelectorAll('#english-section-grade-2 input[type="text"]:checked').forEach(q => {
+                englishAnswersGrade2[q.name] = q.value;
+            });
+        }
+
+        function saveFilipinoAnswersGrade2() {
+            document.querySelectorAll('#filipino-section-grade-2 input[type="radio"]:checked').forEach(q => {
+                filipinoAnswersGrade2[q.name] = q.value;
+            });
+        }
+
+        function saveMathAnswersGrade2() {
+            document.querySelectorAll('#math-section-grade-2 input[type="radio"]:checked').forEach(q => {
+                mathAnswersGrade2[q.name] = q.value;
+            });
+        }
+
+        function saveScienceAnswersGrade2() {
+            document.querySelectorAll('#science-section-grade-e input[type="radio"]:checked').forEach(q => {
+                scienceAnswersGrade2[q.name] = q.value;
+            });
+        }
+
+
+        function checkAnswers(event) {
+    event.preventDefault();
+
+    const grade = document.getElementById('grade-level').value;
+    let answers = {};
+    let englishScore = 0, filipinoScore = 0, mathScore = 0, scienceScore = 0;
+    let totalQuestions = 0;
+
+    // Answers based on the grade
+    if (grade == 1) {
+        answers = {
+            q1: 'C', q2: 'B', q3: 'A', q4: 'A', q5: 'A',  // English
+            q6: 'A', q7: 'A', q8: 'A', q9: 'B', q10: 'A', // Filipino
+            q11: 'A', q12: 'B', q13: 'C', q14: 'A', q15: 'A', // Math
+            q16: 'eyes', q17: 'hands', q18: 'ear', q19: 'tongue', q20: 'mouth' // Science
+        };
+        totalQuestions = 20; // Total questions for Grade 1
+    } else if (grade == 2) {
+        answers = {
+            q21: 'YES', q22: 'NO', q23: 'YES', q24: 'YES', q25: 'NO', // English
+            q26: 'B', q27: 'C', q28: 'B', q29: 'C', q30: 'D', // Filipino
+            q31: 'C', q32: 'A', q33: 'B', q34: 'B', q35: 'A', // Math
+            q36: 'C', q37: 'B', q38: 'B', q39: 'B', q40: 'B' // Science
+        };
+        totalQuestions = 20; // Total questions for Grade 2
+    }
+
+    // Loop through the answers
+    for (let q in answers) {
+        const selected = document.querySelector(`input[name="${q}"]:checked`);
+        const input = document.querySelector(`input[name="${q}"]`);
+
+        // Check radio button answers
+        if (selected) {
+            if (selected.value === answers[q]) {
+                if (grade == 1) {
+                    if (q >= 'q1' && q <= 'q5') englishScore++;
+                    else if (q >= 'q6' && q <= 'q10') filipinoScore++;
+                    else if (q >= 'q11' && q <= 'q15') mathScore++;
+                } else if (grade == 2) {
+                    if (q >= 'q21' && q <= 'q25') englishScore++;
+                    else if (q >= 'q26' && q <= 'q30') filipinoScore++;
+                    else if (q >= 'q31' && q <= 'q35') mathScore++;
+                    else if (q >= 'q36' && q <= 'q40') scienceScore++;
+                }
+            }
+        }
+
+        // Check text input answers
+        if (input && input.type === 'text' && input.value.trim().toLowerCase() === answers[q].toLowerCase()) {
+            if (grade == 1 && q >= 'q16' && q <= 'q20') scienceScore++;
+            else if (grade == 2 && q >= 'q21' && q <= 'q25') englishScore++;
+        }
+    }
+
+    // Prepare to display results in the pop-up
+    document.getElementById('english-score').textContent = `English: ${englishScore}`;
+    document.getElementById('filipino-score').textContent = `Filipino: ${filipinoScore}`;
+    document.getElementById('math-score').textContent = `Math: ${mathScore}`;
+    document.getElementById('science-score').textContent = `Science: ${scienceScore}`;
+    document.getElementById('total-score').textContent = `Total: ${englishScore + filipinoScore + mathScore + scienceScore} out of ${totalQuestions}`;
+
+    // Show the pop-up and overlay
+    document.getElementById('popup').style.display = 'block';
+    document.getElementById('overlay').style.display = 'block';
+}
+
+// Optional: Close modal when clicking on overlay
+document.getElementById('overlay').onclick = closeModal;
+
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Users</title>
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: auto;
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            text-align: center;
+            color: #3e773e;
+            margin-bottom: 30px;
+            font-size: 28px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 30px;
+            font-size: 16px;
+        }
+
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #f2f2f2;
+            color: #333;
+        }
+
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+
+        tbody tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        .password-container {
+            display: flex;
+            align-items: center;
+        }
+
+        .password-container input[type="password"] {
+            border: none;
+            padding: 5px;
+            background: transparent;
+            width: 100%;
+            font-size: 16px;
+        }
+
+        .password-container button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            color: #3e773e;
+            margin-left: 10px;
+        }
+    </style>
+    <script>
+        function togglePassword(id) {
+            var passwordField = document.getElementById(id);
+            var toggleButton = document.getElementById('toggle-' + id);
+            if (passwordField.type === "password") {
+                passwordField.type = "text";
+                toggleButton.textContent = "Hide";
+            } else {
+                passwordField.type = "password";
+                toggleButton.textContent = "Show";
+            }
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h2>Tutors</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>First Name</th>
+                    <th>Last Name</th>
+                    <th>Username</th>
+                    <th>Contact</th>
+                    <th>Expertise</th>
+                    <th>Email</th>
+                    <th>Password</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for tutor in tutors %}
+                    <tr>
+                        <td>{{ tutor[0] }}</td>
+                        <td>{{ tutor[1] }}</td>
+                        <td>{{ tutor[2] }}</td>
+                        <td>{{ tutor[3] }}</td>
+                        <td>{{ tutor[7] }}</td>
+                        <td>{{ tutor[5] }}</td>
+                        <td>{{ tutor[6] }}</td>
+                        <td>
+                            <div class="password-container">
+                                <input type="password" id="password-{{ loop.index }}" value="{{ tutor[4] }}" readonly>
+                                <button type="button" id="toggle-password-{{ loop.index }}" onclick="togglePassword('password-{{ loop.index }}')">Show</button>
+                            </div>
+                        </td>
+                        <td>
+                            <form action="{{ url_for('delete_user') }}" method="post">
+                                <input type="hidden" name="id" value="{{ tutor[0] }}">
+                                <input type="hidden" name="type" value="tutor">
+                                <button type="submit">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        
+        <h2>Students</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>First Name</th>
+                    <th>Last Name</th>
+                    <th>Username</th>
+                    <th>Password</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for student in students %}
+                    <tr>
+                        <td>{{ student[0] }}</td>
+                        <td>{{ student[1] }}</td>
+                        <td>{{ student[2] }}</td>
+                        <td>{{ student[3] }}</td>
+                        <td>
+                            <div class="password-container">
+                                <input type="password" id="password-student-{{ loop.index }}" value="{{ student[4] }}" readonly>
+                                <button type="button" id="toggle-password-student-{{ loop.index }}" onclick="togglePassword('password-student-{{ loop.index }}')">Show</button>
+                            </div>
+                        </td>
+                        <td>
+                            <form action="{{ url_for('delete_user') }}" method="post">
+                                <input type="hidden" name="id" value="{{ student[0] }}">
+                                <input type="hidden" name="type" value="student">
+                                <button type="submit">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

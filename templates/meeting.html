@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meeting Room</title>
+    <link rel="icon" href="{{ url_for('static', filename='tutor.png') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f0f0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        .navbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: #e9e9d8;
+            padding: 10px 20px;
+        }
+        .navbar .logo {
+            display: flex;
+            align-items: center;
+        }
+        .navbar .logo img {
+            margin-right: 10px;
+            width: 60px;
+            height: 60px;
+        }
+        .navbar .logo h1 {
+            color: #3d8236;
+            font-size: 24px;
+            margin: 0;
+        }
+        .content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 20px;
+        }
+        video {
+            width: 60%;
+            border: 2px solid #3d8236;
+            border-radius: 10px;
+            margin: 10px 0;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #3d8236;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        button:hover {
+            background-color: #2f6125;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="navbar">
+        <div class="logo">
+            <img src="{{ url_for('static', filename='tutor.png') }}" alt="Company Logo">
+            <h1>BRIGHT.</h1>
+        </div>
+    </div>
+
+    <div class="content">
+        <h2>Meeting Room</h2>
+        <video id="localVideo" autoplay muted></video>
+        <video id="remoteVideo" autoplay></video>
+        <button id="startButton">Start Call</button>
+        <button id="endButton" disabled>End Call</button>
+    </div>
+
+    <script>
+        let localStream;
+        let remoteStream;
+        let peerConnection;
+        const servers = {
+            iceServers: [
+                { urls: 'stun:stun.l.google.com:19302' }
+            ]
+        };
+
+        const localVideo = document.getElementById('localVideo');
+        const remoteVideo = document.getElementById('remoteVideo');
+
+        document.getElementById('startButton').onclick = startCall;
+        document.getElementById('endButton').onclick = endCall;
+
+        async function startCall() {
+            localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+            localVideo.srcObject = localStream;
+
+            peerConnection = new RTCPeerConnection(servers);
+            peerConnection.onicecandidate = event => {
+                if (event.candidate) {
+                    // Send the candidate to the remote peer (implement signaling here)
+                }
+            };
+
+            peerConnection.ontrack = event => {
+                remoteStream = event.streams[0];
+                remoteVideo.srcObject = remoteStream;
+            };
+
+            localStream.getTracks().forEach(track => {
+                peerConnection.addTrack(track, localStream);
+            });
+
+            const offer = await peerConnection.createOffer();
+            await peerConnection.setLocalDescription(offer);
+
+            // Send the offer to the remote peer (implement signaling here)
+            // When remote peer responds, call peerConnection.setRemoteDescription with the answer
+        }
+
+        function endCall() {
+            peerConnection.close();
+            localStream.getTracks().forEach(track => track.stop());
+            localVideo.srcObject = null;
+            remoteVideo.srcObject = null;
+        }
+    </script>
+
+</body>
+</html>
