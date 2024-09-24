@@ -74,7 +74,7 @@ def init_db():
 
 @app.route('/')
 def index():
-    return render_template('start.html')
+    return render_template('index.html')
 
 @app.route('/home')
 def home():
@@ -251,7 +251,7 @@ def login():
                     session['firstname'] = user[0]
                     return redirect(url_for('home'))
         error = 'Invalid username or password'
-    return render_template('start.html', error=error)
+    return render_template('index.html', error=error)
 
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
